@@ -168,7 +168,7 @@ async function secureRoute(request: Request, context: any) {
     });
   }
 
-  return handler(request, context);
+  return handler(request);
 }
 
 export { secureRoute as GET, secureRoute as POST };
