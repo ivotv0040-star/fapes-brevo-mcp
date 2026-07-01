@@ -7,8 +7,22 @@ export const maxDuration = 60;
 
 const SENDER_NAME = process.env.SENDER_NAME || "Grupo FAPES";
 const SENDER_EMAIL = process.env.SENDER_EMAIL || "marketing@grupofapes.com.br";
-const TO_NAME = process.env.TO_NAME || "Grupo FAPES";
-const TO_EMAIL = process.env.TO_EMAIL || "marketing@grupofapes.com.br";
+
+function parseRecipients(value: string | undefined) {
+  const defaultRecipients =
+    "marketing@grupofapes.com.br,ivo.coelho@grupofapes.com.br";
+
+  return (value || defaultRecipients)
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean)
+    .map((email) => ({
+      email,
+      name: email
+    }));
+}
+
+const TO_RECIPIENTS = parseRecipients(process.env.TO_RECIPIENTS);
 
 function getRequiredEnv(name: string) {
   const value = process.env[name];
@@ -73,24 +87,19 @@ const handler = createMcpHandler(
           "Este e-mail possui conteúdo HTML.";
 
         const brevoPayload = {
-          sender: {
-            name: SENDER_NAME,
-            email: SENDER_EMAIL
-          },
-          to: [
-            {
-              email: TO_EMAIL,
-              name: TO_NAME
-            }
-          ],
-          replyTo: {
-            email: SENDER_EMAIL,
-            name: SENDER_NAME
-          },
-          subject,
-          htmlContent,
-          textContent: fallbackText
-        };
+  sender: {
+    name: SENDER_NAME,
+    email: SENDER_EMAIL
+  },
+  to: TO_RECIPIENTS,
+  replyTo: {
+    email: SENDER_EMAIL,
+    name: SENDER_NAME
+  },
+  subject,
+  htmlContent,
+  textContent: fallbackText
+};
 
         const response = await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
@@ -118,21 +127,21 @@ const handler = createMcpHandler(
         }
 
         const result = {
-          ok: true,
-          messageId: responseJson.messageId || "",
-          from: SENDER_EMAIL,
-          to: TO_EMAIL,
-          subject
-        };
+  ok: true,
+  messageId: responseJson.messageId || "",
+  from: SENDER_EMAIL,
+  to: TO_RECIPIENTS.map((recipient) => recipient.email).join(", "),
+  subject
+};
 
         return {
           structuredContent: result,
           content: [
             {
               type: "text",
-              text: `E-mail HTML enviado com sucesso para ${TO_EMAIL}. Message ID: ${
-                result.messageId || "não informado"
-              }`
+              text: `E-mail HTML enviado com sucesso para ${result.to}. Message ID: ${
+  result.messageId || "não informado"
+}`
             }
           ]
         };
