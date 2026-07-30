@@ -64,7 +64,9 @@ const DEFAULT_BCC_RECIPIENTS = [
   
   "ivo.coelho@grupofapes.com.br",
   
-  "fernanda.correa@grupofapes.com.br"
+  "fernanda.correa@grupofapes.com.br",
+
+  "carlos.rezende@snisaude.com.br"
 
 ].join(",");
 
