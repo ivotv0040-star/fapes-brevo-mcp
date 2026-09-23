@@ -66,7 +66,9 @@ const DEFAULT_BCC_RECIPIENTS = [
   
   "fernanda.correa@grupofapes.com.br",
 
-  "carlos.rezende@snisaude.com.br"
+  "carlos.rezende@snisaude.com.br",
+
+   "comunica@grupofapes.com.br"
 
 ].join(",");
 
